@@ -1,78 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Candle Cost Price Calculator</title>
-<link rel="manifest" href="manifest.json">
 <style>
-body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-input, button { 
-  width: 100%; 
-  padding: 10px; 
-  margin: 8px 0; 
-  font-size: 16px;
-}
-button {
-  cursor: pointer;
-}
-.result {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
-}
+  body { font-family: Arial; padding: 20px; background: #fff8e7; }
+  .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: solid 1px #ccc; }
+  button { background: black; color: white; cursor: pointer; }
+  button:hover { background: #444; }
+  .result { margin-top: 15px; font-size: 18px; font-weight: bold; }
 </style>
-<script>
-// Service Worker registration
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+</head>
 
-// Calculation Logic
+<body>
+<div class="box">
+  <h2>Candle Cost Price Calculator</h2>
+
+  Wax Quantity (gm):
+  <input type="number" id="wax" placeholder="Enter wax in grams">
+
+  Container Price (₹):
+  <input type="number" id="container" placeholder="If no container enter 0">
+
+  Bulk Packaging Needed?
+  <input type="checkbox" id="bulk"> Yes (+₹22)
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="output" class="result"></div>
+</div>
+
+<script>
 function calculate() {
   let wax = parseFloat(document.getElementById("wax").value) || 0;
   let container = parseFloat(document.getElementById("container").value) || 0;
   let bulk = document.getElementById("bulk").checked ? 22 : 0;
 
+  // Base costs
   let waxCost = wax * 0.4;
-  let stearic = wax * 0.05 * 0.4;
-  let viber = wax * 0.01 * 2;
   let scent = wax * 0.08 * 2.5;
   let color = wax * 0.01 * 3;
+  let wick = 1; // add your wick cost here
 
+  let stearic = 0;
+  let viber = 0;
 
-  let raw = waxCost + stearic + viber + scent + color + 1 + container + bulk;
-  let misc = raw * 0.10;
-  let afterMisc = raw + misc;
-  let electricity = raw * 0.10;
-  let total = afterMisc + electricity;
-  let wholesale = raw * 0.40;
+  // Rule: If container exists, skip stearic & viber
+  if (container == 0) {
+    stearic = wax * 0.05 * 0.4;
+    viber = wax * 0.01 * 2;
+  }
 
-  document.getElementById("output").innerHTML = 
-    "Total Cost: ₹" + total.toFixed(2) + "<br>" +
+  // Cost Price = Raw material only
+  let cost = waxCost + stearic + viber + scent + color + wick + container + bulk;
+
+  // Wholesale price = 40% margin
+  let wholesale = cost * 1.40;
+
+  document.getElementById("output").innerHTML =
+    "Cost Price: ₹" + cost.toFixed(2) + "<br>" +
     "Wholesale Price: ₹" + wholesale.toFixed(2);
 }
 </script>
-</head>
-<body>
-
-<h2>🕯️ Candle Cost Price Calculator</h2>
-
-<label>Wax Quantity (grams)</label>
-<input type="number" id="wax" placeholder="Enter wax grams">
-
-<label>Container Price (₹)</label>
-<input type="number" id="container" placeholder="Enter container cost">
-
-<label><input type="checkbox" id="bulk"> Bulk Packing (+₹22)</label>
-
-<button onclick="calculate()">Calculate</button>
-
-<div id="output" class="result"></div>
-
 </body>
 </html>
-
